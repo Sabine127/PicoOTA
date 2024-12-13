@@ -440,13 +440,6 @@ while True:
         for i in range (1,8):
             np[i] = (redVal, greenVal, blueVal)
             np.write()       
-        
 
     
     sleep(1)
-
-
-
-
-
-print('version erneuert')
