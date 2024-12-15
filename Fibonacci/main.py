@@ -8,9 +8,9 @@ import machine
 import owntime
 from WIFI_CONFIG import SSID,PASSWORD
 
-firmware_url="https://github.com/Sabine127/PicoOTA/blob/main/Fibonacci/"
+firmware_url="https://raw.githubusercontent.com/Sabine127/PicoOTA/"
 
-ota_updater = OTAUpdater(SSID, PASSWORD, firmware_url, "main.py")
+ota_updater = OTAUpdater(SSID, PASSWORD, firmware_url, "Fibonacci/main.py")
 ota_updater.download_and_install_update_if_available()
 
 # Zeitzone
