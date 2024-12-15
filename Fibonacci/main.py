@@ -8,10 +8,10 @@ import machine
 import owntime
 from WIFI_CONFIG import SSID,PASSWORD
 
-#firmware_url="https://raw.githubusercontent.com/Sabine127/PicoOTA/Fibonacci"
+firmware_url="https://raw.githubusercontent.com/Sabine127/PicoOTA/Fibonacci/"
 
-#ota_updater = OTAUpdater(SSID, PASSWORD, firmware_url, "main.py")
-#ota_updater.download_and_install_update_if_available()
+ota_updater = OTAUpdater(SSID, PASSWORD, firmware_url, "main.py")
+ota_updater.download_and_install_update_if_available()
 
 # Zeitzone
 TZ_OFFSET = +1
