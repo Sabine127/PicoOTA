@@ -1,6 +1,6 @@
 # Bibliotheken laden
 import network
-#from ota import OTAUpdater
+from ota import OTAUpdater
 from time import sleep
 from machine import Pin,ADC
 import neopixel
