@@ -1,8 +1,8 @@
 # Bibliotheken laden
 import network
-from ota import OTAUpdater
+#from ota import OTAUpdater
 from time import sleep
-from machine import Pin
+from machine import Pin,ADC
 import neopixel
 import machine
 import owntime
@@ -13,42 +13,50 @@ firmware_url="https://raw.githubusercontent.com/Sabine127/PicoOTA/"
 ota_updater = OTAUpdater(SSID, PASSWORD, firmware_url, "Fibonacci/main.py")
 ota_updater.download_and_install_update_if_available()
 
+lightPin=26
+LightPin=ADC(lightPin)
+lightVal=0
+lightFaktor=0.4
+
+modePin=27
+ModePin=ADC(modePin)
+modeVal=0
+Modus=0
+
 # Zeitzone
 TZ_OFFSET = +1
 
 # GPIO-Pin für WS2812
-pin_np = 5
+pin_np = 15
 
 # Anzahl der LEDs
 leds = 40
 
+brightness=0.05 #Wert zwischen 0 und 1
+
 # Farbwerte
-hour_bright=0.2 #Wert zwischen 0 und 1
 hour_redVal = 255
 hour_greenVal = 0
 hour_blueVal = 0
-hour_color = (int(hour_redVal*hour_bright), int(hour_greenVal*hour_bright), int(hour_blueVal*hour_bright))
+hour_color = (int(hour_redVal*brightness), int(hour_greenVal*brightness), int(hour_blueVal*brightness))
 print('hour_color: ',hour_color)
 
-min_bright=0.2 #Wert zwischen 0 und 1
 min_redVal = 100
 min_greenVal = 255
 min_blueVal = 0
-min_color = (int(min_redVal*min_bright), int(min_greenVal*min_bright), int(min_blueVal*min_bright))
+min_color = (int(min_redVal*brightness), int(min_greenVal*brightness), int(min_blueVal*brightness))
 print('min_color: ',min_color)
 
-both_bright=0.2 #Wert zwischen 0 und 1
 both_redVal = 0
 both_greenVal = 0
 both_blueVal = 255
-both_color = (int(both_redVal*both_bright), int(both_greenVal*both_bright), int(both_blueVal*both_bright))
+both_color = (int(both_redVal*brightness), int(both_greenVal*brightness), int(both_blueVal*brightness))
 print('both_color: ',both_color)
 
-none_bright=0.2 #Wert zwischen 0 und 1
 none_redVal = 100
 none_greenVal = 255
 none_blueVal = 255
-none_color = (int(none_redVal*none_bright), int(none_greenVal*none_bright), int(none_blueVal*none_bright))
+none_color = (int(none_redVal*brightness), int(none_greenVal*brightness), int(none_blueVal*brightness))
 print('none_color: ',none_color)
 
 show_color_eins_a=(0,0,0)
@@ -96,12 +104,36 @@ if wlan.isconnected():
     owntime.setTime()
     print('Zeit wurde aus dem Wlan geholt')
 
+
 while True:
+    modeVal=ModePin.read_u16()
+    Modus=int(modeVal/6555)
+    print('Modus: ',Modus)
     
+    lightVal=LightPin.read_u16()
+    brightness=lightFaktor*lightVal/65550
+    print(lightFaktor,lightVal,brightness)
+    hour_color = (int(hour_redVal*brightness), int(hour_greenVal*brightness), int(hour_blueVal*brightness))
+    min_color = (int(min_redVal*brightness), int(min_greenVal*brightness), int(min_blueVal*brightness))
+    both_color = (int(both_redVal*brightness), int(both_greenVal*brightness), int(both_blueVal*brightness))
+    none_color = (int(none_redVal*brightness), int(none_greenVal*brightness), int(none_blueVal*brightness))
+#    print(hour_color,min_color,both_color,none_color)
     # Datum und Uhrzeit lesen
     # Uhrzeit ändern
     datetime = owntime.localTime(TZ_OFFSET)
-    
+
+#	deaktiviert, da es häufig zu Programm-Abstürzen führt
+#    if (datetime[5]+1)%5==0 and datetime[6]==0:
+#        # NTP-Zeit holen
+#        tm = owntime.getTimeNTP()
+#        print(tm)
+#        # Zeit einstellen
+#        machine.RTC().datetime((tm[0], tm[1], tm[2], tm[3], tm[4], tm[5], tm[6],tm[7]))
+#        print('Uhrzeit eingestellt: %02d:%02d:%2d' % (tm[4], tm[5],tm[6]))
+#        print(tm[0],tm[1],tm[2],tm[3],tm[4],tm[5],tm[6])
+#        print()
+
+
     if datetime[4]>=13:
         hours=datetime[4]-12
     else:
@@ -229,14 +261,19 @@ while True:
             m_eins_b=True
         
     if minutes_show==7:
-        m_eins_a=True
-        m_eins_b=True
-        m_zwei=True
-        m_drei=True
+        if h_zwei:
+            m_eins_a=True
+            m_eins_b=True
+        else:
+            m_zwei=True
+        m_fuenf=True
     if minutes_show==6:
         m_eins_b=True
-        m_zwei=True
-        m_drei=True
+        if h_fuenf:
+            m_zwei=True
+            m_drei=True
+        else:
+            m_fuenf=True
     if minutes_show==5:
         if h_fuenf:
             m_eins_a=True
